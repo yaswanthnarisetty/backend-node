@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,5 +16,15 @@
     "moment": "^2.29.4",
     "mongoose": "^6.8.2",
     "nodemon": "^2.0.20"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yaswanthnarisetty/backend-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yaswanthnarisetty/backend-node/issues"
+  },
+  "homepage": "https://github.com/yaswanthnarisetty/backend-node#readme",
+  "description": ""
 }
