@@ -1,4 +1,4 @@
-import User from "../db/User.js";
+import User from "../models/User.js";
 
 export const login = async (req, res) => {
     if (req.body.email && req.body.password) {
