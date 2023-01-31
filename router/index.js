@@ -1,9 +1,8 @@
 import express from "express"
 const router = express.Router()
-import {getProduct,deleteProduct,addProduct,findProduct,updateProduct} from "../controllers/productController"
+import {getProducts,deleteProduct,addProduct,findProduct,updateProduct} from "../controllers/productController.js"
 
-import login from "../controllers/login";
-import register from "../controllers/register";
+import {login,register} from "../controllers/authController.js";
 
 
 
@@ -13,7 +12,7 @@ router.post("/login",login );
 
 router.post("/add-product",addProduct);
 
-router.get("/products",getProduct);
+router.get("/products",getProducts);
 
 router.delete("/product/:id", deleteProduct);
 
@@ -21,4 +20,4 @@ router.get("/product/:id",findProduct);
 
 router.put("/product/:id",updateProduct);
 
-export {router}
+export default router;

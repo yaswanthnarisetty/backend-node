@@ -1,4 +1,4 @@
-const Product = require('../db/Product')
+import Product from '../db/Product.js';
 
  export  const  addProduct =  async (req,res) =>{
     let product=new Product(req.body);
