@@ -4,7 +4,10 @@ import {getProducts,deleteProduct,addProduct,findProduct,updateProduct} from "..
 
 import {login,register} from "../controllers/authController.js";
 
-
+router.get("/", (req, res) => {
+    console.log("hiiiiiiiiiiii");
+    res.send("hello");
+  });
 
 router.post("/register",register);
 
