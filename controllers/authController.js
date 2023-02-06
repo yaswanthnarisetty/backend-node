@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 import Jwt from "jsonwebtoken";
 const jwtKey = "yash";
 
@@ -27,6 +28,11 @@ const jwtKey = "yash";
 //   }
 // };
 
+const securePassword = async (password) => {
+  const passwordHash = await bcrypt.hash(password, 10);
+  return passwordHash;
+};
+
 function isEmail(email) {
   var emailFormat = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
   if (email !== "" && email.match(emailFormat)) {
@@ -40,7 +46,8 @@ export const login = async (req, res) => {
   if (req.body.email) {
     let user = await User.findOne({ email: req.body.email });
     if (user) {
-      if (user.password === req.body.password) {
+      let userPassword = await bcrypt.compare(req.body.password, user.password);
+      if (userPassword) {
         Jwt.sign(
           { _id: user._id, email: user.email, role: user.role },
           jwtKey,
@@ -51,7 +58,7 @@ export const login = async (req, res) => {
                 statsCode: "400",
               });
             }
-            res.send({ user, auth: token });
+            res.send({ name: user.name, email: user.email, auth: token });
           }
         );
       } else {
@@ -96,6 +103,8 @@ export const register = async (req, res) => {
     } else {
       if (isEmail(req.body.email)) {
         if (req.body.password) {
+          req.body.password = await securePassword(req.body.password);
+          console.log(req.body.password);
           user = new User(req.body);
           const result = await user.save();
           Jwt.sign({ result }, jwtKey, (err, token) => {
@@ -107,7 +116,12 @@ export const register = async (req, res) => {
                 status: true,
               });
             }
-            res.send({ result, auth: token });
+            res.send({
+              name: result.name,
+              email: result.email,
+              role: result.role,
+              auth: token,
+            });
           });
         } else {
           res.jsonp({
