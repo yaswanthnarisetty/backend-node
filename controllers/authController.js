@@ -1,54 +1,145 @@
 import User from "../models/User.js";
-import Jwt  from "jsonwebtoken";
+import Jwt from "jsonwebtoken";
+const jwtKey = "yash";
 
-const jwtKey = "yash"
+//check user in the db  if found match password
 
-export const login = async (req, res) => {
-    if (req.body.email && req.body.password) {
-      let user = await User.findOne(req.body);
-      if (user) {
-        Jwt.sign({user},jwtKey,(err,token) =>{
-          if(err){
-            res.send({result : "something went wrong"});
-          }
-          res.send({user , auth: token });
-        })
-        
-      } else {
-        res.send({ result: "no user found" });
-      }
-    } else {
-      res.send({ result: "no user found" });
-    }
+// export const log = async (req, res) => {
+//   if (req.body.email && req.body.password) {
+//     let user = await User.findOne(req.body);
+//     console.log(user);
+//     if (user) {
+//       Jwt.sign(
+//         { _id: user._id, email: user.email, role: user.role },
+//         jwtKey,
+//         (err, token) => {
+//           if (err) {
+//             res.send({ result: "something went wrong" });
+//           }
+//           res.send({ user, auth: token });
+//         }
+//       );
+//     } else {
+//       res.send({ result: "no user found" });
+//     }
+//   } else {
+//     res.send({ result: "no user found" });
+//   }
+// };
+
+function isEmail(email) {
+  var emailFormat = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+  if (email !== "" && email.match(emailFormat)) {
+    return true;
+  }
+
+  return false;
 }
 
+export const login = async (req, res) => {
+  if (req.body.email) {
+    let user = await User.findOne({ email: req.body.email });
+    if (user) {
+      if (user.password === req.body.password) {
+        Jwt.sign(
+          { _id: user._id, email: user.email, role: user.role },
+          jwtKey,
+          (err, token) => {
+            if (err) {
+              res.jsonp({
+                message: "something went wrong",
+                statsCode: "400",
+              });
+            }
+            res.send({ user, auth: token });
+          }
+        );
+      } else {
+        res.jsonp({
+          message: "incorrect password",
+          statusCode: "406",
+          status: true,
+        });
+      }
+    } else {
+      if (isEmail(req.body.email)) {
+        res.jsonp({
+          message: "you are not registered",
+          statusCode: "404",
+          status: true,
+        });
+      } else {
+        res.jsonp({
+          message: "enter valid email",
+          statusCode: "406",
+          status: true,
+        });
+      }
+
+      // res.send({ result: "enter valid email" });
+    }
+  }
+};
+
+//check in the db for user first
 
 export const register = async (req, res) => {
-    const user = new User(req.body);
-    const result = await user.save();
-
-    Jwt.sign({result},jwtKey,(err,token) =>{
-      if(err){
-        res.send({result : "something went wrong"});
+  if (req.body.email) {
+    let user = await User.findOne({ email: req.body.email });
+    if (user) {
+      res.jsonp({
+        message: "user already found",
+        statusCode: "403",
+        status: true,
+      });
+      // res.send("user already found");
+    } else {
+      if (isEmail(req.body.email)) {
+        if (req.body.password) {
+          user = new User(req.body);
+          const result = await user.save();
+          Jwt.sign({ result }, jwtKey, (err, token) => {
+            if (err) {
+              // res.send({ result: "something went wrong" });
+              res.jsonp({
+                message: "something went wrong",
+                statusCode: "403",
+                status: true,
+              });
+            }
+            res.send({ result, auth: token });
+          });
+        } else {
+          res.jsonp({
+            message: "please provide the  password",
+            statusCode: "406",
+            status: true,
+          });
+        }
+      } else {
+        res.jsonp({
+          message: "enter valid email",
+          statusCode: "406",
+          status: true,
+        });
       }
-      res.send({result , auth: token });
-    })
+    }
   }
+};
 
-export function verifyToken(req,res,next){
-  let token = req.headers['authorization']
-  if(token){
-    Jwt.verify(token,jwtKey,(err , valid)=>{
-      if(err){
+export function verifyToken(req, res, next) {
+  let token = req.headers["authorization"];
+  if (token) {
+    Jwt.verify(token, jwtKey, (err, valid) => {
+      if (err) {
         res.send("please enter a valid token");
+      } else {
+        req.role = valid.role;
+        req.userId = valid._id;
+        next();
       }
-      else{
-        next()
-      }
-    })
-  }
-  else{
-      res.send("please add a token")
-
+    });
+  } else {
+    res.send("please add a token");
   }
 }

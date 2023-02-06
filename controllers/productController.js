@@ -16,7 +16,15 @@ import Product from '../models/Product.js';
 }
 
  export const getProducts = async (req,res) =>{
-    let product = await Product.find();
+    console.log(req.role)
+    let product
+    if(req.role === "admin"){
+        product = await Product.find();
+    }
+    else{
+        product = await Product.find({userId:req.userId})
+    }
+    
     if(product.length>0){
         res.send(product)
     }
