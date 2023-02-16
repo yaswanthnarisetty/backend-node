@@ -1,7 +1,10 @@
 
 import mongoose from 'mongoose';
 
-export const mon = mongoose.connect('mongodb://127.0.0.1:27017/cruddb',{useNewUrlParser:true});
+
+mongoose.set('strictQuery', false);
+export const mon = mongoose.connect('mongodb+srv://yash:Yash1234@crusdb.zjtgnoc.mongodb.net/?retryWrites=true&w=majority',{useNewUrlParser:true});
+
 
 
 // var MongoClient = require('mongodb').MongoClient;

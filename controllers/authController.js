@@ -55,16 +55,16 @@ export const login = async (req, res) => {
             if (err) {
               res.jsonp({
                 message: "something went wrong",
-                statsCode: "400",
+                statusCode: 400,
               });
             }
-            res.send({ name: user.name, email: user.email, auth: token });
+            res.jsonp({ name: user.name, email: user.email, auth: token });
           }
         );
       } else {
         res.jsonp({
           message: "incorrect password",
-          statusCode: "406",
+          statusCode: 406,
           status: true,
         });
       }
@@ -72,7 +72,7 @@ export const login = async (req, res) => {
       if (isEmail(req.body.email)) {
         res.jsonp({
           message: "you are not registered",
-          statusCode: "404",
+          statusCode: 404,
           status: true,
         });
       } else {
@@ -96,7 +96,7 @@ export const register = async (req, res) => {
     if (user) {
       res.jsonp({
         message: "user already found",
-        statusCode: "403",
+        statusCode: 403,
         status: true,
       });
       // res.send("user already found");
@@ -112,7 +112,7 @@ export const register = async (req, res) => {
               // res.send({ result: "something went wrong" });
               res.jsonp({
                 message: "something went wrong",
-                statusCode: "403",
+                statusCode: 403,
                 status: true,
               });
             }
@@ -126,14 +126,14 @@ export const register = async (req, res) => {
         } else {
           res.jsonp({
             message: "please provide the  password",
-            statusCode: "406",
+            statusCode: 406,
             status: true,
           });
         }
       } else {
         res.jsonp({
           message: "enter valid email",
-          statusCode: "406",
+          statusCode: 406,
           status: true,
         });
       }
